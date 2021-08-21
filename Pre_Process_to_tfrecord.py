@@ -10,10 +10,10 @@ import numpy as np
 import tensorflow as tf
 
 # File Location,Here we make allTrain datasets split into train and valid-----------------------------------------------
-annotation = r'G:\CV_\Multimodal Fusion Seach\captions_train-val2014\annotations'
-images_dir = r'G:\CV\Multimodal Fusion Seach\train2014'
-tfrecords_dir = r'G:\CV\Multimodal Fusion Seach\tfrecords'
-annotation_file = r'G:\CV\Multimodal Fusion Seach\captions_train-val2014\annotations\captions_train2014.json'
+annotation = r'G:\Multimodal Fusion Seach\captions_train-val\annotations'
+images_dir = r'G:\Multimodal Fusion Seach\train'
+tfrecords_dir = r'G:\Multimodal Fusion Seach\tfrecords'
+annotation_file = r'G:\Multimodal Fusion Seach\captions_train-val\annotations\captions_train.json'
 
 # retrive all image_paths-----------------------------------------------------------------------------------------------
 with open(annotation_file,'r') as f:
@@ -21,7 +21,7 @@ with open(annotation_file,'r') as f:
 image_path_to_caption = collections.defaultdict(list)
 for element in annotations:
     caption = element['caption'].lower().rstrip('.')
-    image_path = images_dir + r'\COCO_train2014_' + "%012d.jpg"%(element['image_id'])
+    image_path = images_dir + r'\COCO_train_' + "%012d.jpg"%(element['image_id'])
     # print(image_path)                  ??????
     image_path_to_caption[image_path].append(caption)   # type:{'image_path_1':['caption_1','caption2'],'image_path_2':['caption_1','caption2']}
     # print(image_path_to_caption)
