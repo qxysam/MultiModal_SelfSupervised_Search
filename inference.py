@@ -25,6 +25,7 @@ def read_image(image_path):
 print('Generating visual embeddings......')
 def find_matches(image_embeddings,queries,k=9,normalize=True):
     query_embedding = text_encoder.predict(tf.convert_to_tensor(queries))
+    # 标准化后再算相似度，需要标准化，这里原始数据是create_vision_encoder和create_text_encoder模型计算后输出的原始特征向量，还未标准化。
     if normalize:
         image_embeddings = tf.math.l2_normalize(image_embeddings,axis=1)
         query_embedding = tf.math.l2_normalize(query_embedding, axis=1)
