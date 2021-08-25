@@ -86,18 +86,19 @@ class DualEncoder(tf.keras.Model):
         return [self.loss_tracker]
 
     def __call__(self,features,training=False):
+        # 向量标准化后，才能作为Predict_True值，否则拟合会出错：如以下向量：a=(1,2), b=(1,3)等等......自身内积会比不同实体的内积更小了，拟合就会变成拟合不同的实体的向量内积，违背目标，所以向量应该先归一化，再作为Predict_True！
         with tf.device('/gpu:0'):
-            caption_embeddings = self.text_encoder(features['caption'],training=training)
+            caption_embeddings = tf.nn.l2_normalize(self.text_encoder(features['caption'],training=training), axis=1)
         with tf.device('/gpu:1'):
-            image_embeddings = self.image_encoder(features['image'], training=training)
-        return caption_embeddings,image_embeddings
+            image_embeddings = tf.nn.l2_normalize(self.image_encoder(features['image'], training=training), axis=1)
+        return caption_embeddings, image_embeddings
 
 
     # Implement the LOSS Function-------------------------------------------------------------------------------------------
     # In order to compute the loss, compute the pair-wise inner product similarity between each text_vect_i and vision_vect_j in one batch_size
     # Then use Cross-Entropy LOSS to compute the final loss in view of both rows and columns (average)
     def compute_loss(self,caption_embeddings, image_embeddings):
-        # generate Multimodal similarity Matrix
+        # generate Multimodal similarity Matrix, T 越小越尖锐，越大越平，这里为了拉开自身向量内积和其他的距离，设置小点；不用管内积前和运算后的符号，通过softmax，后始终是将最大映射为更接近1，最小的更接近0，他们映射后值的总和为1的概率分布
         logits = tf.keras.activations.softmax( tf.matmul( caption_embeddings, image_embeddings,transpose_b= True ) / self.temperature )
 
         # generate Singlemodal similarity Matrix
